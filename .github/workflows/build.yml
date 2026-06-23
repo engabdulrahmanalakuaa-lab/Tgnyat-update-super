@@ -1,0 +1,40 @@
+name: Build Technologies Soft to EXE
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: استنساخ المستودع
+        uses: actions/checkout@v4
+
+      - name: تثبيت Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: تثبيت الاعتماديات
+        run: |
+          npm install
+
+      - name: إعادة بناء الوحدات الأصلية (لتتناسب مع Electron)
+        run: |
+          npx electron-builder install-app-deps
+
+      - name: بناء ملف التثبيت EXE
+        run: |
+          npm run dist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: رفع ملف التثبيت كـ Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Technologies-Soft-Installer
+          path: dist/*.exe
