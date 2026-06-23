@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقنيات سوفت - مطعم</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
+        body { display: flex; height: 100vh; overflow: hidden; background: #f4f6f9; }
+        .sidebar { width: 240px; background: #2c3e50; color: #ecf0f1; display: flex; flex-direction: column; padding: 15px 0; }
+        .sidebar .logo { padding: 0 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .sidebar .logo i { font-size: 28px; color: #e67e22; }
+        .sidebar .logo h2 { font-size: 18px; font-weight: 800; }
+        .nav-menu { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 10px; overflow-y: auto; }
+        .nav-btn { display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: transparent; border: none; color: #ecf0f1; font-size: 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; text-align: right; width: 100%; }
+        .nav-btn i { width: 20px; }
+        .nav-btn:hover { background: rgba(255,255,255,0.1); }
+        .nav-btn.active { background: #e67e22; color: #fff; font-weight: 700; }
+        .user-info { display: flex; align-items: center; gap: 10px; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; }
+        .user-info i { font-size: 30px; color: #e67e22; }
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; background: #f4f6f9; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .page-header h1 { font-size: 24px; color: #2c3e50; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 12px; }
+        .stat-icon { font-size: 28px; color: #e67e22; }
+        .stat-info h3 { font-size: 13px; color: #7f8c8d; margin-bottom: 4px; }
+        .stat-info p { font-size: 20px; font-weight: 700; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        th, td { padding: 12px; text-align: right; border-bottom: 1px solid #e0e0e0; }
+        th { background: #f8f9fa; font-weight: 700; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: #e67e22; color: #fff; }
+        .btn-danger { background: #e74c3c; color: #fff; }
+        .btn-success { background: #27ae60; color: #fff; }
+        .btn-secondary { background: #95a5a6; color: #fff; }
+        .btn-warning { background: #f39c12; color: #fff; }
+        .btn-sm { padding: 4px 10px; font-size: 13px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 10px; padding: 25px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 4px; font-weight: 600; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 2px solid #bdc3c7; border-radius: 6px; font-size: 14px; }
+        .pos-container { display: flex; gap: 20px; height: calc(100vh - 150px); }
+        .menu-section { flex: 1; background: white; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; }
+        .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-bottom: 10px; }
+        .cat-btn { padding: 12px; border: 2px solid #e67e22; border-radius: 8px; background: white; cursor: pointer; font-weight: 700; }
+        .cat-btn.active { background: #e67e22; color: white; }
+        .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; overflow-y: auto; flex: 1; }
+        .item-card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .item-card:hover { border-color: #e67e22; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .invoice-section { width: 400px; background: white; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; }
+        .cart-items { flex: 1; overflow-y: auto; max-height: 300px; }
+        .cart-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; align-items: center; }
+        .cart-total { font-size: 20px; font-weight: 800; padding: 10px 0; border-top: 2px solid #e67e22; }
+        .payment-options { display: flex; gap: 10px; margin: 10px 0; }
+        .payment-options button { flex: 1; padding: 10px; border: 2px solid #ddd; border-radius: 6px; background: white; cursor: pointer; font-weight: 700; }
+        .payment-options button.active { border-color: #e67e22; background: #fdf2e9; }
+        .stock-danger { background-color: #fadbd8; font-weight: bold; }
+        .alert-warning { background: #fef3cd; border: 1px solid #f39c12; padding: 10px; border-radius: 6px; margin: 10px 0; }
+        .shift-info-box { background: #ebf5fb; border-right: 4px solid #2980b9; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-size: 14px; font-weight: 700; display: flex; justify-content: space-between; }
+        .badge { background: #e67e22; color: white; padding: 2px 10px; border-radius: 12px; font-size: 12px; }
+        @media print { body * { visibility: hidden; } #thermal-receipt, #shift-report-receipt { visibility: visible; position: absolute; left: 0; top: 0; width: 74mm; margin: 0; padding: 2mm; font-size: 12px; background: white; color: black; direction: rtl; } }
+
+        /* أنماط لوحة المفاتيح اللمسية */
+        .kb-btn {
+            padding: 8px 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            min-width: 40px;
+            text-align: center;
+            user-select: none;
+        }
+        .kb-btn:active { background: #d0d0d0; }
+        #touch-keyboard {
+            direction: rtl;
+            display: none;
+            position: fixed;
+            bottom: 60px;
+            left: 0;
+            width: 100%;
+            background: #eee;
+            padding: 10px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+            z-index: 9998;
+        }
+        #touch-keyboard .kb-btn { direction: ltr; }
+        #toggle-keyboard-btn {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- شاشة تسجيل الدخول -->
+    <div id="login-screen" style="display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(44,62,80,0.95); justify-content:center; align-items:center; z-index:9999; flex-direction:column;">
+        <div style="background:white; padding:30px; border-radius:10px; text-align:center; min-width:320px;">
+            <h2 style="margin-bottom:20px; color:#2c3e50;">تقنيات سوفت - المطعم</h2>
+            <div class="form-group">
+                <input type="text" id="login-username" placeholder="اسم المستخدم" style="padding:10px; width:100%; margin-bottom:10px;">
+            </div>
+            <div class="form-group">
+                <input type="password" id="login-password" placeholder="كلمة المرور" style="padding:10px; width:100%; margin-bottom:10px;">
+            </div>
+            <button class="btn btn-primary" onclick="submitLogin()" style="width:100%;">دخول</button>
+            <p style="margin-top:15px; font-size:12px; color:#7f8c8d;">تصميم م/ عبدالرحمن الاكوع - 773579486 967+</p>
+        </div>
+    </div>
+
+    <!-- التطبيق الرئيسي -->
+    <div id="app-main" style="display:none; width:100%;">
+        <aside class="sidebar">
+            <div class="logo"><i class="fas fa-utensils"></i><h2>تقنيات سوفت</h2></div>
+            <nav class="nav-menu">
+                <button class="nav-btn active" data-tab="dashboard"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</button>
+                <button class="nav-btn" data-tab="pos"><i class="fas fa-cash-register"></i> نقطة البيع</button>
+                <button class="nav-btn" data-tab="products"><i class="fas fa-boxes"></i> المنتجات</button>
+                <button class="nav-btn" data-tab="categories"><i class="fas fa-tags"></i> الأقسام</button>
+                <button class="nav-btn" data-tab="materials"><i class="fas fa-cubes"></i> المواد الخام</button>
+                <button class="nav-btn" data-tab="tables"><i class="fas fa-chair"></i> الطاولات</button>
+                <button class="nav-btn" data-tab="waiters"><i class="fas fa-user-tie"></i> الكباتن</button>
+                <button class="nav-btn" data-tab="reports"><i class="fas fa-chart-line"></i> التقارير</button>
+                <button class="nav-btn" data-tab="expenses"><i class="fas fa-money-bill-wave"></i> المصروفات</button>
+                <button class="nav-btn" data-tab="audit"><i class="fas fa-history"></i> سجل التدقيق</button>
+                <button class="nav-btn" data-tab="users"><i class="fas fa-users-cog"></i> المستخدمين</button>
+                <button class="nav-btn" data-tab="settings"><i class="fas fa-cog"></i> الإعدادات</button>
+            </nav>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <div style="display:flex; flex-direction:column; align-items:flex-start;">
+                    <span id="current-user-display">مدير النظام</span>
+                    <span id="user-role-badge" style="font-size:11px; background:#e67e22; padding:0 8px; border-radius:10px;">admin</span>
+                </div>
+            </div>
+        </aside>
+        <main class="main-content" id="main-content"></main>
+    </div>
+
+    <!-- مودال عام -->
+    <div id="modal" class="modal"><div class="modal-content" id="modal-content"></div></div>
+
+    <!-- مودال بيانات الشركة (أول تشغيل) -->
+    <div id="company-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3 style="margin-bottom:15px; text-align:center;">بيانات المطعم والضريبة</h3>
+            <p style="text-align:center; color:#7f8c8d; margin-bottom:15px;">تظهر هذه البيانات في الفواتير والتقارير</p>
+            <div class="form-group"><label>اسم المطعم</label><input type="text" id="company-name" placeholder="اسم المطعم"></div>
+            <div class="form-group"><label>رقم الهاتف</label><input type="text" id="company-phone" placeholder="رقم الهاتف"></div>
+            <div class="form-group"><label>العنوان</label><input type="text" id="company-address" placeholder="العنوان"></div>
+            <div class="form-group"><label>الرقم الضريبي (اختياري)</label><input type="text" id="company-tax" placeholder="الرقم الضريبي"></div>
+            <div class="form-group"><label>نسبة الضريبة (%)</label><input type="number" id="company-tax-rate" placeholder="مثال: 15" step="0.01" min="0" value="0"></div>
+            <button class="btn btn-primary" onclick="saveCompanyFromModal()" style="width:100%;">حفظ</button>
+        </div>
+    </div>
+
+    <!-- مودال إرجاع الطلب -->
+    <div id="refund-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3 style="margin-bottom:15px;">إرجاع طلب</h3>
+            <div class="form-group"><label>رقم الطلب</label><input type="number" id="refund-order-id" placeholder="أدخل رقم الطلب"></div>
+            <div class="form-group"><label>سبب الإرجاع</label><input type="text" id="refund-reason" placeholder="سبب الإرجاع"></div>
+            <button class="btn btn-danger" onclick="processRefund()" style="width:100%;">تأكيد الإرجاع</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('refund-modal').style.display='none'" style="width:100%; margin-top:5px;">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- مودال تغيير كلمة المرور -->
+    <div id="password-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3 style="margin-bottom:15px;">تغيير كلمة المرور</h3>
+            <div class="form-group"><label>كلمة المرور الحالية</label><input type="password" id="old-password"></div>
+            <div class="form-group"><label>كلمة المرور الجديدة</label><input type="password" id="new-password"></div>
+            <div class="form-group"><label>تأكيد كلمة المرور</label><input type="password" id="confirm-password"></div>
+            <button class="btn btn-primary" onclick="changePassword()" style="width:100%;">تغيير</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('password-modal').style.display='none'" style="width:100%; margin-top:5px;">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- مناطق الطباعة (مخفية) -->
+    <div id="thermal-receipt" style="display:none;"></div>
+    <div id="shift-report-receipt" style="display:none;"></div>
+
+    <!-- زر لوحة المفاتيح اللمسية -->
+    <button id="toggle-keyboard-btn" class="btn btn-secondary">⌨️ لوحة المفاتيح</button>
+
+    <!-- لوحة المفاتيح اللمسية -->
+    <div id="touch-keyboard">
+        <div style="display:flex; flex-wrap:wrap; gap:4px; justify-content:center;">
+            <!-- صف الأرقام -->
+            <button class="kb-btn" data-char="1">1</button>
+            <button class="kb-btn" data-char="2">2</button>
+            <button class="kb-btn" data-char="3">3</button>
+            <button class="kb-btn" data-char="4">4</button>
+            <button class="kb-btn" data-char="5">5</button>
+            <button class="kb-btn" data-char="6">6</button>
+            <button class="kb-btn" data-char="7">7</button>
+            <button class="kb-btn" data-char="8">8</button>
+            <button class="kb-btn" data-char="9">9</button>
+            <button class="kb-btn" data-char="0">0</button>
+            <button class="kb-btn" data-char=".">.</button>
+            <button class="kb-btn" data-char=",">,</button>
+            <!-- صف الحروف العربية -->
+            <button class="kb-btn" data-char="أ">أ</button>
+            <button class="kb-btn" data-char="ب">ب</button>
+            <button class="kb-btn" data-char="ت">ت</button>
+            <button class="kb-btn" data-char="ث">ث</button>
+            <button class="kb-btn" data-char="ج">ج</button>
+            <button class="kb-btn" data-char="ح">ح</button>
+            <button class="kb-btn" data-char="خ">خ</button>
+            <button class="kb-btn" data-char="د">د</button>
+            <button class="kb-btn" data-char="ذ">ذ</button>
+            <button class="kb-btn" data-char="ر">ر</button>
+            <button class="kb-btn" data-char="ز">ز</button>
+            <button class="kb-btn" data-char="س">س</button>
+            <button class="kb-btn" data-char="ش">ش</button>
+            <button class="kb-btn" data-char="ص">ص</button>
+            <button class="kb-btn" data-char="ض">ض</button>
+            <button class="kb-btn" data-char="ط">ط</button>
+            <button class="kb-btn" data-char="ظ">ظ</button>
+            <button class="kb-btn" data-char="ع">ع</button>
+            <button class="kb-btn" data-char="غ">غ</button>
+            <button class="kb-btn" data-char="ف">ف</button>
+            <button class="kb-btn" data-char="ق">ق</button>
+            <button class="kb-btn" data-char="ك">ك</button>
+            <button class="kb-btn" data-char="ل">ل</button>
+            <button class="kb-btn" data-char="م">م</button>
+            <button class="kb-btn" data-char="ن">ن</button>
+            <button class="kb-btn" data-char="ه">ه</button>
+            <button class="kb-btn" data-char="و">و</button>
+            <button class="kb-btn" data-char="ي">ي</button>
+            <!-- أزرار تحكم -->
+            <button class="kb-btn" data-char="backspace" style="background:#f39c12;">⌫</button>
+            <button class="kb-btn" data-char="space" style="background:#3498db; width:80px;">مسافة</button>
+            <button class="kb-btn" data-char="clear" style="background:#e74c3c;">مسح الكل</button>
+            <button class="kb-btn" id="kb-close" style="background:#95a5a6;">إغلاق</button>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
