@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --win --x64",
+    "dist": "electron-builder --win --ia32 --x64",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
@@ -22,8 +22,16 @@
     "appId": "com.technologies-soft.pos",
     "productName": "تقنيات سوفت - مطعم",
     "win": {
-      "target": "nsis",
-      "requestedExecutionLevel": "requireAdministrator"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
+      "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
       "oneClick": false,
