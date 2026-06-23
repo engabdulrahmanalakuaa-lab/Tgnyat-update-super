@@ -23,10 +23,6 @@ jobs:
         run: |
           npm install
 
-      - name: إعادة بناء الوحدات الأصلية (لتتناسب مع Electron)
-        run: |
-          npx electron-builder install-app-deps
-
       - name: بناء ملف التثبيت EXE
         run: |
           npm run dist
